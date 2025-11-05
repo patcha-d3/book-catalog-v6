@@ -13,3 +13,4 @@ If you are developing a production application, we recommend using TypeScript wi
 
 # book-catalog-v5
 # book-catalog-v6
+# book-catalog-v6
