@@ -339,6 +339,7 @@ dialog::backdrop {
   font-weight: bold;
   color: #555;
   font-size: 0.9rem;
+  background-color: white;
 }
 
 .form-row input {
@@ -347,6 +348,8 @@ dialog::backdrop {
   border-radius: 6px;
   font-size: 0.9rem;
   transition: border-color 0.2s ease;
+  background-color: white;
+  color: black;
 }
 
 .form-row input:focus {
@@ -439,17 +442,31 @@ dialog::backdrop {
 }
 
 .author-dropdown {
-  padding: 0.5em 0.8em;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #fff;
-  font-size: 0.95rem;
+  padding: 0.6em 2em;
+  border: 2px solid #f1a08f;
+  border-radius: 8px;
+  background-color: #fff8f6;
+  font-size: 1rem;
+  color: #444;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  appearance: none; /* ซ่อนลูกศร default */
+  background-image: url("data:image/svg+xml;utf8,<svg fill='salmon' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.8em center;
+  background-size: 1em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.author-dropdown:hover {
+  border-color: salmon;
+  background-color: #fff1ed;
 }
 
 .author-dropdown:focus {
-  outline: none;
   border-color: salmon;
-  box-shadow: 0 0 0 2px rgba(250, 128, 114, 0.2);
+  box-shadow: 0 0 0 3px rgba(250, 128, 114, 0.3);
+  outline: none;
 }
 
 /* โครง content เป็นคอลัมน์: filter บน / body ล่าง */
@@ -489,4 +506,225 @@ dialog::backdrop {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.manage-loans-row {
+  display: flex;
+  justify-content: center;
+  margin-top: -1em;
+  margin-bottom: 1.5em;
+  padding-top: 1em;
+}
+.manage-loans-btn {
+  width: 12em;
+  text-align: center;
+  background-color: salmon;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  padding: 0.6em 0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.manage-loans-btn:hover {
+  background-color: darkred;
+}
+
+/* ============================
+   Loan Manager (panel & page)
+   ============================ */
+
+/* กล่อง panel ฝั่งซ้าย */
+.loan-panel {
+  width: 100%;
+  max-width: 16rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px dashed #f1a08f;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333; /* ✅ ตัวอักษรอ่านง่าย */
+}
+
+.loan-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  color: salmon;
+}
+
+/* ส่วนข้อมูลหนังสือที่ยืม */
+.loan-meta {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.muted {
+  color: #777;
+}
+
+.loan-form {
+  display: grid;
+  gap: 0.75rem;
+  background-color: white;
+  color: black;
+}
+
+.loan-form input,
+.loan-form select {
+  background-color: white; /* พื้นหลังพีชอ่อน */
+  border: 1px solid #f1a08f;
+  border-radius: 6px;
+  padding: 0.5em;
+  color: #333;
+  font-weight: 500;
+}
+
+.loan-form input::placeholder {
+  color: #888;
+}
+
+.loan-form label {
+  color: #333; /* ป้องกัน label เป็นสีขาวด้วย */
+}
+
+/* label และ input */
+.loan-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: #333;
+  background-color: #fff;
+}
+
+.loan-label input {
+  padding: 0.6em 0.8em;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: #fff;
+  color: #333;
+}
+
+.loan-label input:focus {
+  outline: none;
+  border-color: salmon;
+  box-shadow: 0 0 0 2px rgba(250, 128, 114, 0.25);
+}
+
+/* ปุ่มยืม / คืน */
+.loan-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.loan-actions button {
+  flex: 1;
+  padding: 0.6em 0;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* ปุ่มยืม */
+.loan-actions .button-update {
+  background-color: salmon;
+  color: white;
+}
+
+.loan-actions .button-update:hover {
+  background-color: darkred;
+}
+
+/* ปุ่มคืน */
+.loan-actions .button-ghost {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+}
+
+.loan-actions .button-ghost:hover {
+  border-color: salmon;
+  color: darkred;
+}
+
+/* ============================
+   Loan Manager (full page mode)
+   ============================ */
+.loan-manager-page {
+  display: grid;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px dashed #f1a08f;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #333;
+}
+
+.loaned-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.loaned-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.loan-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid lightgrey;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.loan-item-row {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.loan-item-row strong {
+  color: salmon;
+}
+
+/* ปุ่ม Back */
+.loan-manager-page .button-update {
+  width: 10em;
+  justify-self: start;
+  background-color: salmon;
+  color: white;
+}
+
+.loan-manager-page .button-update:hover {
+  background-color: darkred;
+}
+
+.book-loan-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: #a300f5;
+  color: white;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }

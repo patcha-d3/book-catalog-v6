@@ -1,24 +1,27 @@
-// App.jsx
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import Modal from "./components/Modal.jsx";
 import AddBook from "./components/AddBook.jsx";
 import Book from "./book.jsx";
 import BookFilter from "./components/BookFilter.jsx";
+import LoanManager from "./components/LoanManager.jsx";
 
 const LS_KEY = "books_v5";
 
 function App() {
   const [books, setBooks] = useState([]);
 
-  // Filter state (ตัวอย่าง: author)
+  // filter
   const [filterCriteria, setFilterCriteria] = useState({ author: "" });
 
-  // Edit dialog state
+  // edit dialog
   const editDialogRef = useRef(null);
   const [editingBook, setEditingBook] = useState(null);
 
-  // LocalStorage: load once
+  // toggle หน้า Manage Loans แบบเต็มหน้า
+  const [showLoans, setShowLoans] = useState(false);
+
+  // load from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_KEY);
@@ -29,12 +32,12 @@ function App() {
     } catch {}
   }, []);
 
-  // LocalStorage: save on change
+  // save to localStorage
   useEffect(() => {
     localStorage.setItem(LS_KEY, JSON.stringify(books));
   }, [books]);
 
-  // เลือกได้ทีละเล่ม
+  // เลือกการ์ดทีละเล่ม (ใช้ isbn13)
   const toggleSelect = (isbn13) => {
     setBooks((prev) =>
       prev.map((book) =>
@@ -54,6 +57,7 @@ function App() {
       image: newBook.url || "https://via.placeholder.com/150x200?text=Book",
       url: newBook.url || "#",
       isUserAdded: true,
+      loan: undefined,
     };
     setBooks((prev) => [...prev, withDefaults]);
   };
@@ -79,18 +83,44 @@ function App() {
     setBooks((prev) =>
       prev.map((b) =>
         b.isbn13 === editingBook.isbn13
-          ? {
-              ...b,
-              ...patch,
-              image: patch.url || b.image, // อัปเดตรูปถ้าเปลี่ยน URL
-            }
+          ? { ...b, ...patch, image: patch.url || b.image }
           : b
       )
     );
     setEditingBook(null);
   };
 
-  // Filter
+  // จัดการยืม/คืน
+  const saveLoan = ({ isbn13, borrower, weeks }) => {
+    const w = Math.max(1, Math.min(4, Number(weeks) || 1));
+    const now = new Date();
+    const due = new Date(now);
+    due.setDate(due.getDate() + w * 7);
+
+    setBooks((prev) =>
+      prev.map((b) =>
+        b.isbn13 === isbn13
+          ? {
+              ...b,
+              loan: {
+                borrower: borrower.trim(),
+                weeks: w,
+                borrowedAt: now.toISOString(),
+                dueDate: due.toISOString(),
+              },
+            }
+          : b
+      )
+    );
+  };
+
+  const returnLoan = (isbn13) => {
+    setBooks((prev) =>
+      prev.map((b) => (b.isbn13 === isbn13 ? { ...b, loan: undefined } : b))
+    );
+  };
+
+  // filter change
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilterCriteria((p) => ({ ...p, [name]: value }));
@@ -106,6 +136,8 @@ function App() {
     return byAuthor;
   });
 
+  const selectedBook = books.find((b) => b.selected) || null;
+
   return (
     <div className="app">
       <header className="app-header">
@@ -113,41 +145,64 @@ function App() {
       </header>
 
       <main className="content">
-        {/* 🔹 แถวบน: Filter กลางหน้า */}
-        <div className="filters-row">
-          <BookFilter
-            filterCriteria={filterCriteria}
-            onFilterChange={handleFilterChange}
-            authors={uniqueAuthors}
+        {showLoans ? (
+          <LoanManager
+            mode="page"
+            books={books}
+            onLoan={(isbn13, borrower, weeks) =>
+              saveLoan({ isbn13, borrower, weeks })
+            }
+            onReturn={returnLoan}
+            onBack={() => setShowLoans(false)}
           />
-        </div>
+        ) : (
+          <>
+            {/* แถวบน: Filter */}
+            <div className="filters-row">
+              <BookFilter
+                filterCriteria={filterCriteria}
+                onFilterChange={handleFilterChange}
+                authors={uniqueAuthors}
+              />
+            </div>
 
-        {/* 🔹 แถวล่าง: สองคอลัมน์ (ซ้ายปุ่ม/ขวาการ์ด) */}
-        <div className="content-body">
-          <div className="content-add">
-            <Modal btnLabel="Add" btnClassName="button-add">
-              <AddBook onAdd={handleAddBook} />
-            </Modal>
-
-            <div className="action-buttons">
-              <button className="button-update" onClick={handleUpdateBook}>
-                Edit
-              </button>
-              <button className="button-delete" onClick={handleDeleteBook}>
-                Delete
+            {/* ปุ่ม Manage Loans ตรงกลางใต้ Filter */}
+            <div className="manage-loans-row">
+              <button
+                className="button-update manage-loans-btn"
+                onClick={() => setShowLoans(true)}
+              >
+                Manage Loans
               </button>
             </div>
-          </div>
 
-          <BookTile books={filteredBooks} onSelect={toggleSelect} />
-        </div>
+            {/* แถวล่าง: ซ้ายปุ่ม/ขวาการ์ด */}
+            <div className="content-body">
+              <div className="content-add">
+                <Modal btnLabel="Add" btnClassName="button-add">
+                  <AddBook onAdd={handleAddBook} />
+                </Modal>
+
+                <div className="action-buttons">
+                  <button className="button-update" onClick={handleUpdateBook}>
+                    Edit
+                  </button>
+                  <button className="button-delete" onClick={handleDeleteBook}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              <BookTile books={filteredBooks} onSelect={toggleSelect} />
+            </div>
+          </>
+        )}
       </main>
 
       <footer className="footer">
         <p>© Pat Sricome, 2025</p>
       </footer>
 
-      {/* Edit dialog */}
       <dialog ref={editDialogRef}>
         {editingBook && (
           <AddBook
@@ -178,6 +233,7 @@ function BookTile({ books, onSelect }) {
           title={book.title}
           author={book.author}
           image={book.image}
+          loan={book.loan}
           selected={book.selected}
           onSelect={() => onSelect(book.isbn13)}
         />
