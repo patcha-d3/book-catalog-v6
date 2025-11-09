@@ -141,7 +141,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Book Catalog 5</h1>
+        <h1>Book Catalog 6</h1>
       </header>
 
       <main className="content">
