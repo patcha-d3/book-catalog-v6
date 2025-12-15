@@ -66,6 +66,9 @@ function App() {
   const handleDeleteBook = () => {
     const selectedBook = books.find((b) => b.selected);
     if (!selectedBook) return alert("Please select a book to delete.");
+    if (selectedBook.loan) {
+      return alert("Cannot delete a book that is currently on loan. Please return it first.");
+    }
     setBooks((prev) => prev.filter((b) => b.isbn13 !== selectedBook.isbn13));
   };
 
@@ -73,6 +76,9 @@ function App() {
   const handleUpdateBook = () => {
     const selectedBook = books.find((b) => b.selected);
     if (!selectedBook) return alert("Please select a book to edit.");
+    if (selectedBook.loan) {
+      return alert("Cannot edit a book that is currently on loan. Please return it first.");
+    }
     setEditingBook(selectedBook);
     editDialogRef.current?.showModal();
   };
@@ -184,10 +190,20 @@ function App() {
                 </Modal>
 
                 <div className="action-buttons">
-                  <button className="button-update" onClick={handleUpdateBook}>
+                  <button 
+                    className="button-update" 
+                    onClick={handleUpdateBook}
+                    disabled={selectedBook?.loan}
+                    title={selectedBook?.loan ? "Cannot edit a book that is on loan" : ""}
+                  >
                     Edit
                   </button>
-                  <button className="button-delete" onClick={handleDeleteBook}>
+                  <button 
+                    className="button-delete" 
+                    onClick={handleDeleteBook}
+                    disabled={selectedBook?.loan}
+                    title={selectedBook?.loan ? "Cannot delete a book that is on loan" : ""}
+                  >
                     Delete
                   </button>
                 </div>

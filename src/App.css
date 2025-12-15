@@ -299,6 +299,19 @@ dialog form {
   background-color: lightpink;
 }
 
+.button-update:disabled,
+.button-delete:disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button-update:disabled:hover,
+.button-delete:disabled:hover {
+  background-color: #ccc;
+}
+
 /* ---------- Modal (dialog) ---------- */
 dialog {
   border: none;
